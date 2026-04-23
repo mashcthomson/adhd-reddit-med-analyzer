@@ -1,0 +1,6 @@
+{
+  "name": "ADHD Reddit Med-Analyzer",
+  "description": "Analyze ADHD medication experiences from Reddit to find peer-matched alternatives and strategies.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

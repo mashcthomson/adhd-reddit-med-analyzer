@@ -1,0 +1,7 @@
+{
+  "error": "insufficient_ram",
+  "note": "System RAM was 87% baseline (13.7/15.6GB) with only 2GB free. Analysis needs 3-4GB at peak for comment reading phase. Aborted to prevent OOM crash.",
+  "timestamp": "2026-04-15T17:04:35.264Z",
+  "partialProgress": "Search phase completed ~1600 posts found. Aborted before comment reading.",
+  "recommendation": "Close browser tabs or restart Windows to free RAM, then rerun analysis manually."
+}
