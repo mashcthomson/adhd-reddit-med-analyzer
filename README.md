@@ -1,70 +1,64 @@
 # ADHD Reddit Med Analyzer
 
-> **Finding the right ADHD medication shouldn't take 2–3 years.**
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini_Flash-4285F4?style=flat-square&logo=google&logoColor=white)
 
-For most people with ADHD, the path to effective treatment is a long, frustrating process of trial and error. The average person cycles through multiple medications, multiple dosages, and multiple failures — often spending **2 to 3 years** before finding something that actually works. During that time, symptoms go unmanaged, quality of life suffers, and the emotional toll adds up.
-
-This tool exists to shorten that journey.
-
----
-
-## What It Does
-
-**ADHD Reddit Med Analyzer** is a full-stack TypeScript application that mines real medication experiences shared on Reddit (r/ADHD, r/adhdwomen) and uses vector similarity search to match your specific symptom and medication profile to people who've been in your exact situation — and found something that worked.
-
-Instead of starting from scratch, you can see:
-- Which medications worked for people with **your symptom profile**
-- Which medications failed, and **why** (side effects, tolerance, dosage issues)
-- What dosage adjustments or combinations others found effective
-- Patterns across people who had the **same prior medication failures as you**
-
-It's not medical advice. It's the collective experience of thousands of people who've already walked this road — surfaced intelligently and matched to you.
+> Finding the right ADHD medication shouldn't take 2–3 years.
 
 ---
 
-## The Problem It Solves
+## The problem
 
-ADHD medication management is notoriously slow because:
+For most people with ADHD, finding the right medication is a long, frustrating process of trial and error. You try something for six weeks, it doesn't work, you wait a month for your next psychiatrist appointment, try something else, repeat. The average person spends **2 to 3 years** cycling through medications before landing on one that actually works.
 
-- **Psychiatrist appointments are infrequent** — often monthly or less
-- **Each medication trial takes weeks** to assess properly
-- **There's no systematic way** to learn from others with similar profiles
-- **Reddit has years of rich, detailed experiences** — but it's unsearchable in any meaningful way
+The frustrating part is that the knowledge to shorten that search already exists. It's scattered across hundreds of thousands of Reddit posts — people sharing in detail what worked, what didn't, what side effects they experienced, what dosage adjustments helped. It's all there. It's just completely unsearchable in any meaningful way.
 
-This app changes that last point. It treats Reddit as a structured dataset, extracts medication outcomes using LLMs, and makes that knowledge searchable by symptom and experience similarity.
+This app is an attempt to fix that.
 
 ---
 
-## How It Works
+## What it does
+
+**ADHD Reddit Med Analyzer** mines real medication experiences from r/ADHD and r/adhdwomen, extracts structured data from them using LLMs, and uses vector similarity search to match your specific symptom and medication profile to people who've been in your exact situation — and found something that worked.
+
+You input your symptoms, your current medications, and what hasn't worked for you. The app embeds that profile and searches it against a database of real Reddit user experiences. What comes back is a stream of the most similar profiles, showing what ultimately worked for them and why.
+
+It's not medical advice. It's the collective experience of thousands of people who've already walked this road, surfaced intelligently and matched to you.
+
+---
+
+## How it works
 
 ```
- Your Profile Input
+Your Profile Input
         |
         v
-  Vector Embedding (Nomic Embed)
+Vector Embedding (Nomic Embed)
         |
         v
-  Similarity Search (pgvector / Supabase)
+Similarity Search (pgvector / Supabase)
         |
         v
-  Matched Reddit Users with Similar Profiles
+Matched Reddit Users with Similar Profiles
         |
         v
-  Surface: What Worked, What Didn't, and Why
+Surface: What Worked, What Didn't, and Why
         |
         v
-  Streamed to UI in Real-Time (SSE)
+Streamed to UI in Real-Time (SSE)
 ```
 
 1. **Scrape** — Posts from r/ADHD and r/adhdwomen are collected and stored
 2. **Extract** — Parallel LLM workers (Gemini Flash / Claude Haiku) parse each post for medications, dosages, symptom profiles, side effects, and outcomes
-3. **Embed** — Each user profile and post is embedded with Nomic Embed and stored in pgvector (Supabase)
-4. **Match** — You input your symptoms, current/past medications, and what hasn't worked. That profile is embedded and similarity-searched against the database
-5. **Surface** — The app streams back the most similar Reddit users and what ultimately worked for them
+3. **Embed** — Each profile is embedded with Nomic Embed and stored in pgvector (Supabase)
+4. **Match** — Your input profile is embedded and similarity-searched against the database
+5. **Surface** — The app streams back the closest matches and what worked for them
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
@@ -78,66 +72,42 @@ This app changes that last point. It treats Reddit as a structured dataset, extr
 
 ---
 
-## Project Structure
+## Project structure
 
 ```
 adhd-reddit-med-analyzer/
-├── frontend/                      # React/Vite UI
+├── frontend/                       # React/Vite UI
 │   └── src/
-│       ├── components/            # Profile input form, results viewer
-│       └── hooks/                 # SSE streaming hook
-├── backend/                       # Express API server
-│   ├── scraper/                   # Reddit scraping logic
-│   ├── workers/                   # Parallel LLM extraction workers
-│   ├── embeddings/                # Nomic Embed integration
-│   └── routes/                    # SSE + REST endpoints
-├── overnight-orchestrator.mjs     # Long-running scrape orchestration
-└── ram-monitor.mjs                # Memory monitoring for overnight jobs
+│       ├── components/             # Profile input form, results viewer
+│       └── hooks/                  # SSE streaming hook
+├── backend/                        # Express API server
+│   ├── scraper/                    # Reddit scraping logic
+│   ├── workers/                    # Parallel LLM extraction workers
+│   ├── embeddings/                 # Nomic Embed integration
+│   └── routes/                     # SSE + REST endpoints
+├── overnight-orchestrator.mjs      # Long-running scrape orchestration
+└── ram-monitor.mjs                 # Memory monitoring for overnight jobs
 ```
 
 ---
 
-## Getting Started
+## Getting started
 
 **Prerequisites:** Node.js 18+, a Supabase project with pgvector enabled
 
 ```bash
-# Clone the repo
 git clone https://github.com/mashcthomson/adhd-reddit-med-analyzer.git
 cd adhd-reddit-med-analyzer
-
-# Install dependencies
 npm install
 cd frontend && npm install && cd ..
-
-# Configure environment
 cp .env.example .env
-# Fill in your API keys (see Environment Variables below)
-
-# Start backend
+# Fill in your API keys
 npm run dev
-
-# Start frontend (separate terminal)
-cd frontend && npm run dev
 ```
 
 ---
 
-## Long-running Data Jobs
-
-The scraper is designed to run overnight to build up a large enough dataset for meaningful matching.
-
-```bash
-# Run the overnight scrape + extraction pipeline
-node overnight-orchestrator.mjs
-
-# Monitor memory usage during long jobs
-node ram-monitor.mjs
-```
-
----
-
-## Environment Variables
+## Environment variables
 
 | Variable | Description |
 |---|---|
@@ -150,14 +120,32 @@ node ram-monitor.mjs
 
 ---
 
-## Disclaimer
+## Running the data pipeline
 
-This tool is for **informational and research purposes only**. It does not provide medical advice. Always consult a qualified healthcare professional before making any changes to your medication. The experiences surfaced from Reddit reflect individual anecdotes and are not clinical recommendations.
+The scraper is designed to run overnight to build a large enough dataset for meaningful matching:
+
+```bash
+# Run the overnight scrape + extraction pipeline
+node overnight-orchestrator.mjs
+
+# Monitor memory usage during long jobs
+node ram-monitor.mjs
+```
 
 ---
 
-## Why This Matters
+## Disclaimer
 
-ADHD affects roughly 1 in 14 adults. Effective treatment is life-changing — improved focus, better relationships, reduced anxiety, higher functioning. But the years-long medication search is a known, well-documented problem that nobody has solved well.
+This tool is for **informational and research purposes only**. It does not provide medical advice. Always consult a qualified healthcare professional before making any changes to your medication. The experiences surfaced from Reddit are individual anecdotes, not clinical recommendations.
 
-The knowledge to shorten that search already exists. It's scattered across hundreds of thousands of Reddit posts. This app is an attempt to make it useful.
+---
+
+## Why this matters
+
+ADHD affects roughly 1 in 14 adults. Effective treatment is genuinely life-changing — better focus, better relationships, lower anxiety. But the years-long medication search is a well-documented problem that nobody has solved well at scale.
+
+The knowledge to shorten it exists. This is an attempt to make it useful.
+
+---
+
+*Personal project – Monish Chezhian, 2024*
